@@ -1,0 +1,10 @@
+BEGIN;
+CREATE TABLE IF NOT EXISTS branches(id BIGSERIAL PRIMARY KEY,name TEXT NOT NULL,code TEXT UNIQUE NOT NULL,city TEXT,state TEXT,active BOOLEAN NOT NULL DEFAULT TRUE,created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS staff_branch_access(user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,branch_id BIGINT NOT NULL REFERENCES branches(id) ON DELETE CASCADE,is_primary BOOLEAN NOT NULL DEFAULT FALSE,PRIMARY KEY(user_id,branch_id));
+CREATE TABLE IF NOT EXISTS role_permissions(role TEXT NOT NULL,permission TEXT NOT NULL,PRIMARY KEY(role,permission));
+ALTER TABLE leads ADD COLUMN IF NOT EXISTS branch_id BIGINT REFERENCES branches(id);
+ALTER TABLE applications ADD COLUMN IF NOT EXISTS branch_id BIGINT REFERENCES branches(id);
+INSERT INTO role_permissions(role,permission) VALUES ('admin','crm.view_all'),('admin','crm.assign'),('admin','crm.export'),('admin','branch.manage'),('admin','staff.manage'),('admin','reports.view'),('staff','crm.view_assigned'),('staff','crm.update_assigned'),('staff','reports.view_own') ON CONFLICT DO NOTHING;
+INSERT INTO branches(name,code,city,state) VALUES('Head Office','HQ','Bardhaman','West Bengal') ON CONFLICT(code) DO NOTHING;
+CREATE INDEX IF NOT EXISTS idx_leads_branch_status ON leads(branch_id,status); CREATE INDEX IF NOT EXISTS idx_apps_branch_status ON applications(branch_id,status);
+COMMIT;
