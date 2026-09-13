@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "start": "node server.js",
+    "start:prod": "node scripts/init-db.js && npm run migrate && node server.js",
+    "init-db": "node scripts/init-db.js",
     "bootstrap-admin": "node scripts/bootstrap-admin.js",
     "migrate": "node scripts/migrate.js",
     "test": "node --test tests/*.test.js",
