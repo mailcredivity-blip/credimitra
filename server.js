@@ -8,6 +8,7 @@ const {Pool}=require("pg");
 const bcrypt=require("bcryptjs");
 const jwt=require("jsonwebtoken");
 const path=require("path");
+const registerAdminSetup=require("./admin-setup");
 
 const app=express();
 const PORT=process.env.PORT||3000;
@@ -22,6 +23,7 @@ app.use(express.json({limit:"1mb"}));
 app.use(rateLimit({windowMs:15*60*1000,max:300}));
 app.use(express.static(path.join(__dirname,"public")));
 async function q(t,p=[]){return pool.query(t,p)}
+registerAdminSetup(app,q);
 function auth(req,res,next){const h=req.headers.authorization||"";if(!h.startsWith("Bearer "))return res.status(401).json({error:"Login required"});try{req.user=jwt.verify(h.slice(7),JWT_SECRET);next()}catch{return res.status(401).json({error:"Invalid token"})}}
 function admin(req,res,next){if(!["admin","staff"].includes(req.user.role))return res.status(403).json({error:"Admin access required"});next()}
 async function audit(req,action,entity_type,entity_id,metadata={}){try{await q("INSERT INTO audit_logs(actor_user_id,action,entity_type,entity_id,metadata,ip_address) VALUES($1,$2,$3,$4,$5,$6)",[req.user?.id||null,action,entity_type,String(entity_id||""),JSON.stringify(metadata),req.ip||null])}catch{}}
