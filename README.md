@@ -2,9 +2,13 @@
 
 Production-oriented loan counselling and operations platform.
 
+## Railway deployment
+
+Primary production deployment is on Railway. The app initializes the base schema, applies migrations, and starts the Node server. Health endpoint: `/health`.
+
 ## Deploy on Render
 
-This repository includes `render.yaml` for a Render Blueprint deployment.
+This repository also includes `render.yaml` for a Render Blueprint deployment.
 
 1. Open Render Dashboard.
 2. Choose **New → Blueprint**.
